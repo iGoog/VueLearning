@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Session 1</title>
+    <script src="vue.js"></script>
+
+</head>
+<body>
+
+<div id="app">
+    <button v-on:click="increase(2, $event)">Click Me</button>
+    <p>{{ counter }}</p>
+    <p v-on:mousemove="updateCoordinates">Coordinates: {{ x }} / {{ y }}
+    - <span v-on:mousemove.stop="">DEAD SPOT</span>
+
+    <!-- you can use .stop or .prevent to do stop propogation, or the prevent... -->
+
+    <input type="text" v-on:keyup.enter.space="alertMe">
+    <!-- we can have "key modifiers" and even chain them to make them specific
+    see: https://vuejs.org/v2/guide/events.html#Key-Modifiers  -->
+</div>
+
+</body>
+
+<script>
+new Vue({
+    el: '#app',
+    data: {
+        counter: 0,
+        x: 0,
+        y: 0
+    },
+    methods: {
+        increase: function(step, event) {
+            this.counter+=step;
+        },
+        updateCoordinates: function(event) {
+            this.x = event.clientX
+            this.y = event.clientY;
+        },
+        dummy: function(event) {
+            // forcibly stop events from populating up
+            event.stopPropagation();
+        },
+        alertMe: function(event) {
+            alert('yo');
+        }
+    }
+
+})
+
+</script>
+
+</html>
