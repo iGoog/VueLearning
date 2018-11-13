@@ -27,11 +27,12 @@
 <body>
 
 <div id="app">
-    <div class="demo"
-         @click="attachRed = !attachRed" :class="divClasses"></div>
-<div class="demo" :class="{red: attachRed}"></div>
-<div class="demo" :class="[color, { red: attachRed}]"></div>
+    <div class="demo" @click="attachRed = !attachRed" :class="divClasses"></div>
+    <div class="demo" :class="{red: attachRed}"></div>
+    <div class="demo" :class="[color, { red: attachRed}]"></div>
+    <div class="demo" :style="(backgroundColor: color}"></div>
     <input type="text" v-model="color">
+    <input type="text" v-model="width">
  </div>
 
 </body>
@@ -41,7 +42,8 @@ new Vue({
     el: '#app',
     data: {
         attachRed : false,
-        color: 'green'
+        color: 'green',
+        width: 100
     },
     computed: {
         divClasses: function() {
@@ -49,7 +51,14 @@ new Vue({
                 red: this.attachRed,
                 blue: !this.attachRed
             }
+        },
+        myStyle: function() {
+            return {
+                backgroundColor: this.color,
+                width: this.width + 'px'
+            }
         }
+
     }
 
 })
