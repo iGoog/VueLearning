@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Monster Slayer</title>
+    <script src="https://npmcdn.com/vue/dist/vue.js"></script>
+    <link rel="stylesheet" href="css/foundation.min.css">
+    <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="app">
+    <section class="row">
+        <div class="small-6 columns">
+            <h1 class="text-center">{{player.name}}</h1>
+            <div class="healthbar">
+                <div class="healthmeter healthbar text-center" :style="playerHealth">
+
+                </div>
+            </div>
+        </div>
+        <div class="small-6 columns">
+            <h1 class="text-center">{{monster.name}}</h1>
+            <div class="healthbar">
+                <div class="healthmeter healthbar text-center"  :style="monsterHealth">
+
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="row controls">
+        <div class="small-12 columns">
+            <button id="start-game" @click="startNewGame">START NEW GAME</button>
+        </div>
+    </section>
+    <section class="row controls">
+        <div class="small-12 columns">
+            <button id="attack" @click="attack">ATTACK</button>
+            <button id="special-attack" @click="specialAttack">SPECIAL ATTACK</button>
+            <button id="heal" @click="healSelf">HEAL</button>
+            <button id="give-up" @click="giveUp">GIVE UP</button>
+        </div>
+    </section>
+    <section class="row log">
+        <div class="small-12 columns">
+            <ul>
+                <template v-for="(log, i) in fightLog">
+                    <li v-if="i<15" :class="log.style">
+                        {{log.message}}
+                    </li>
+                </template>
+
+            </ul>
+        </div>
+    </section>
+</div>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            player : {
+                name : "Paul",
+                maxHealth : 100,
+                currentHealth: 100,
+                attackPower : 2,
+                specialAttachPower : 3,
+                healPower : 3
+            },
+            monster : {
+                name : "Dragon",
+                maxHealth : 200,
+                currentHealth: 200,
+                attackPower : 2
+            },
+            fightLog : []
+        },
+        computed: {
+            divClasses: function() {
+                return {
+                    red: this.attachRed,
+                    blue: !this.attachRed
+                }
+            },
+            myStyle: function() {
+                return {
+                    backgroundColor: this.color,
+                    width: this.width + 'px'
+                }
+            },
+            playerHealth: function() {
+                return {
+                  width: Math.floor(( this.player.currentHealth / this.player.maxHealth )*100) + "%"
+                }
+            },
+            monsterHealth: function() {
+                return {
+                    width: Math.floor(( this.monster.currentHealth / this.monster.maxHealth )*100) + "%"
+                }
+            }
+
+        },
+        methods: {
+            startNewGame: function() {
+                this.player.currentHealth = this.player.maxHealth;
+                this.monster.currentHealth = this.monster.maxHealth;
+                this.fightLog=[];
+            },
+            attack : function() {
+                this.hit(this.player, this.monster, this.d6(this.player.attackPower), "player-turn");
+                this.tick();
+
+            },
+            specialAttack : function() {
+                this.hit(this.player, this.monster, this.d6(this.player.specialAttachPower), "player-turn");
+                this.tick();
+            },
+            healSelf : function() {
+                this.heal(this.player, this.player, this.d6(this.player.healPower), "player-turn");
+                this.tick();
+            },
+            giveUp : function() {
+                alert("You've been eaten by a grue");
+                this.startNewGame();
+            },
+            tick : function() {
+                this.hit(this.monster, this.player, this.d6(this.monster.attackPower), "monster-turn");
+                if (this.player.currentHealth < 1) {
+                    alert(this.player.name + " IS DEAD!!! GAME OVER!")
+                    this.startNewGame();
+                }
+                if (this.monster.currentHealth < 1) {
+                    alert(this.monster.name + " IS DEAD!!! YOU WIN!")
+                    this.startNewGame();
+                }
+            },
+            hit: function(actor, target, quantity, style) {
+                target.currentHealth -= quantity;
+                this.logFight(actor, "HITS", target, quantity, style);
+            },
+            heal: function(actor, target, quantity, style) {
+                target.currentHealth += quantity;
+                if (target.currentHealth > target.maxHealth) {
+                    quantity -= (target.currentHealth - target.maxHealth)
+                    target.currentHealth = target.maxHealth;
+                }
+                this.logFight(actor, "HEALS", target, quantity, style);
+            },
+            logFight: function(actor, action, target, quantity, style) {
+                this.fightLog.unshift( {
+                    style : style,
+                    message : actor.name + " "+  action + " " + target.name + " FOR " + quantity
+                });
+            },
+            d6 : function(rolls) {
+                var t = 0;
+                for (var i=0; i<rolls; i++) t+= Math.floor(Math.random() * 5) + 1;
+                return t;
+            }
+        }
+
+    })
+</script>
+</body>
+</html>
