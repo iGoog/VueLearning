@@ -26,12 +26,12 @@
             </div>
         </div>
     </section>
-    <section class="row controls">
+    <section class="row controls" v-if="scene==0">
         <div class="small-12 columns">
             <button id="start-game" @click="startNewGame">START NEW GAME</button>
         </div>
     </section>
-    <section class="row controls">
+    <section class="row controls" v-if="scene==1">
         <div class="small-12 columns">
             <button id="attack" @click="attack">ATTACK</button>
             <button id="special-attack" @click="specialAttack">SPECIAL ATTACK</button>
@@ -56,6 +56,7 @@
     new Vue({
         el: '#app',
         data: {
+            scene : 0,
             player : {
                 name : "Paul",
                 maxHealth : 100,
@@ -102,6 +103,7 @@
                 this.player.currentHealth = this.player.maxHealth;
                 this.monster.currentHealth = this.monster.maxHealth;
                 this.fightLog=[];
+                this.scene = 1;
             },
             attack : function() {
                 this.hit(this.player, this.monster, this.d6(this.player.attackPower), "player-turn");
@@ -118,17 +120,17 @@
             },
             giveUp : function() {
                 alert("You've been eaten by a grue");
-                this.startNewGame();
+                this.scene = 0;
             },
             tick : function() {
                 this.hit(this.monster, this.player, this.d6(this.monster.attackPower), "monster-turn");
                 if (this.player.currentHealth < 1) {
-                    alert(this.player.name + " IS DEAD!!! GAME OVER!")
-                    this.startNewGame();
+                    if (confirm(this.player.name + " IS DEAD!!! GAME OVER!\n New Game?")) this.startNewGame();
+                    else this.scene = 0;
                 }
                 if (this.monster.currentHealth < 1) {
-                    alert(this.monster.name + " IS DEAD!!! YOU WIN!")
-                    this.startNewGame();
+                    if (confirm(this.monster.name + " IS DEAD!!! YOU WIN!\n New Game?")) this.startNewGame();
+                    else this.scene = 0;
                 }
             },
             hit: function(actor, target, quantity, style) {
